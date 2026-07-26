@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SentinelFlow - Triage Queue</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#2f3635",
+                        "secondary-container": "#3e4753",
+                        "outline-variant": "#3c4948",
+                        "on-surface": "#dde4e2",
+                        "surface-tint": "#3cdcd1",
+                        "surface": "#0e1514",
+                        "tertiary": "#ffffff",
+                        "on-secondary": "#28313c",
+                        "on-primary-container": "#00716b",
+                        "secondary-fixed": "#dae3f2",
+                        "primary-fixed-dim": "#3cdcd1",
+                        "on-tertiary-container": "#646469",
+                        "primary": "#ffffff",
+                        "inverse-on-surface": "#2b3231",
+                        "inverse-primary": "#006a64",
+                        "tertiary-fixed": "#e3e2e8",
+                        "on-background": "#dde4e2",
+                        "on-primary-fixed-variant": "#00504b",
+                        "on-error": "#690005",
+                        "on-secondary-fixed": "#131c27",
+                        "on-tertiary-fixed-variant": "#46464b",
+                        "primary-container": "#62f9ee",
+                        "surface-container": "#1a2120",
+                        "background": "#0e1514",
+                        "inverse-surface": "#dde4e2",
+                        "on-error-container": "#ffdad6",
+                        "primary-fixed": "#62f9ee",
+                        "tertiary-container": "#e3e2e8",
+                        "surface-bright": "#333b3a",
+                        "surface-container-high": "#242b2a",
+                        "on-primary": "#003734",
+                        "error": "#ffb4ab",
+                        "on-secondary-container": "#adb6c4",
+                        "surface-dim": "#0e1514",
+                        "on-primary-fixed": "#00201e",
+                        "error-container": "#93000a",
+                        "secondary": "#bec7d6",
+                        "on-secondary-fixed-variant": "#3e4753",
+                        "secondary-fixed-dim": "#bec7d6",
+                        "tertiary-fixed-dim": "#c7c6cb",
+                        "surface-container-highest": "#2f3635",
+                        "surface-container-lowest": "#090f0f",
+                        "on-tertiary-fixed": "#1a1b20",
+                        "outline": "#859491",
+                        "on-tertiary": "#2f3035",
+                        "surface-container-low": "#161d1c",
+                        "on-surface-variant": "#bacac7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1440px",
+                        "margin": "24px",
+                        "unit": "4px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Geist"],
+                        "data-mono": ["JetBrains Mono"],
+                        "label-xs": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "data-mono": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "label-xs": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Tactical Glows */
+        .glow-critical { box-shadow: 0 0 12px rgba(255, 180, 171, 0.4); }
+        .glow-cyan { box-shadow: 0 0 12px rgba(60, 220, 209, 0.4); }
+        .glow-amber { box-shadow: 0 0 12px rgba(255, 213, 107, 0.4); } /* Custom amber for tactical use */
+        
+        /* Custom Scrollbar for density */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3c4948; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3cdcd1; }
+    </style>
+</head>
+<body class="bg-background text-on-background h-screen w-full overflow-hidden flex font-body-md selection:bg-surface-tint selection:text-surface">
+<!-- Shared Component: SideNavBar -->
+<nav class="h-screen w-64 fixed left-0 top-0 bg-surface/80 backdrop-blur-xl border-r border-outline-variant/20 shadow-[0_0_15px_rgba(60,220,209,0.1)] flex flex-col z-50 transition-all duration-200 ease-in-out">
+<!-- Header -->
+<div class="px-6 py-8 border-b border-outline-variant/20">
+<div class="font-data-mono text-headline-md font-bold tracking-tighter text-surface-tint uppercase mb-1">
+                SENTINEL_FLOW
+            </div>
+<div class="font-label-xs text-label-xs text-on-surface-variant flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-surface-tint animate-pulse"></span>
+                STATUS: FUSION_ACTIVE
+            </div>
+</div>
+<!-- CTA -->
+<div class="px-4 py-6">
+<button class="w-full py-3 border border-surface-tint text-surface-tint font-label-xs text-label-xs uppercase hover:bg-surface-tint hover:text-surface transition-colors shadow-[0_0_10px_rgba(60,220,209,0.2)]" onclick="alert('Deep Scan initiated across all clusters...');">
+                INITIATE_SCAN
+            </button>
+</div>
+<!-- Main Navigation -->
+<div class="flex-1 flex flex-col gap-1 px-2 py-4 overflow-y-auto">
+<!-- Tab 0: Command Center -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 hover:shadow-[0_0_10px_rgba(60,220,209,0.2)] transition-all duration-200 ease-in-out active:scale-95 group" href="/" onclick="">
+<span class="material-symbols-outlined group-hover:text-surface-tint transition-colors text-[20px]" data-icon="dashboard">dashboard</span>
+<span class="font-data-mono text-data-mono">Command Center</span>
+</a>
+<!-- Tab 1: Triage Queue (ACTIVE) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-surface-variant/30 text-surface-tint border-l-2 border-surface-tint hover:bg-surface-variant/50 hover:shadow-[0_0_10px_rgba(60,220,209,0.2)] transition-all duration-200 ease-in-out active:scale-95 group" href="/triage" onclick="">
+<span class="material-symbols-outlined text-[20px]" data-icon="security">security</span>
+<span class="font-data-mono text-data-mono">Triage Queue</span>
+</a>
+<!-- Tab 2: Investigation -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 hover:shadow-[0_0_10px_rgba(60,220,209,0.2)] transition-all duration-200 ease-in-out active:scale-95 group" href="/investigation" onclick="">
+<span class="material-symbols-outlined group-hover:text-surface-tint transition-colors text-[20px]" data-icon="biotech">biotech</span>
+<span class="font-data-mono text-data-mono">Investigation</span>
+</a>
+<!-- Tab 3: Entity Profile -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 hover:shadow-[0_0_10px_rgba(60,220,209,0.2)] transition-all duration-200 ease-in-out active:scale-95 group" href="/entity_profile" onclick="">
+<span class="material-symbols-outlined group-hover:text-surface-tint transition-colors text-[20px]" data-icon="account_tree">account_tree</span>
+<span class="font-data-mono text-data-mono">Entity Profile</span>
+</a>
+</div>
+<!-- Footer Navigation -->
+<div class="px-2 py-4 border-t border-outline-variant/20 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 hover:shadow-[0_0_10px_rgba(60,220,209,0.2)] transition-all duration-200 ease-in-out active:scale-95 group" href="#" onclick="alert('This feature is currently locked in the MVP demo.'); return false;">
+<span class="material-symbols-outlined group-hover:text-surface-tint transition-colors text-[20px]" data-icon="analytics">analytics</span>
+<span class="font-data-mono text-data-mono">System Status</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 hover:shadow-[0_0_10px_rgba(60,220,209,0.2)] transition-all duration-200 ease-in-out active:scale-95 group" href="#" onclick="alert('This feature is currently locked in the MVP demo.'); return false;">
+<span class="material-symbols-outlined group-hover:text-surface-tint transition-colors text-[20px]" data-icon="settings">settings</span>
+<span class="font-data-mono text-data-mono">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Workspace Area -->
+<main class="ml-64 flex-1 flex flex-col h-screen relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-surface-container to-background">
+<!-- Shared Component: TopAppBar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-surface/60 backdrop-blur-md border-b border-outline-variant/20 flex justify-between items-center px-6 z-40">
+<!-- Brand / Product Name -->
+<div class="font-data-mono text-headline-md font-black tracking-widest text-surface-tint uppercase">
+                SENTINEL_FLOW_v2.4
+            </div>
+<!-- Navigation Links (Center) -->
+<div class="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 h-full">
+<a class="h-full flex items-center text-surface-tint font-bold border-b-2 border-surface-tint px-2 font-data-mono text-data-mono cursor-pointer transition-all duration-150 active:opacity-70" href="#" onclick="alert('This feature is currently locked in the MVP demo.'); return false;">
+                    Models: Fusion
+                </a>
+<a class="h-full flex items-center text-on-surface-variant font-data-mono text-data-mono px-2 hover:text-surface-tint hover:bg-surface-variant/20 cursor-pointer transition-all duration-150 active:opacity-70 border-b-2 border-transparent" href="#" onclick="alert('This feature is currently locked in the MVP demo.'); return false;">
+                    IForest
+                </a>
+<a class="h-full flex items-center text-on-surface-variant font-data-mono text-data-mono px-2 hover:text-surface-tint hover:bg-surface-variant/20 cursor-pointer transition-all duration-150 active:opacity-70 border-b-2 border-transparent" href="#" onclick="alert('This feature is currently locked in the MVP demo.'); return false;">
+                    Markov
+                </a>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-6">
+<!-- Search (implied on_right layout) -->
+<div class="relative hidden xl:block">
+<input class="bg-surface-container border border-outline-variant text-data-mono font-data-mono px-3 py-1.5 focus:outline-none focus:border-surface-tint focus:ring-1 focus:ring-surface-tint w-64 text-on-surface placeholder:text-on-surface-variant/50 transition-all" placeholder="Query Node/IP..." type="text"/>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+</div>
+<div class="flex items-center gap-4 border-l border-outline-variant/30 pl-6">
+<button class="text-on-surface-variant hover:text-surface-tint transition-colors cursor-pointer active:opacity-70" title="Notifications">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+</button>
+<button class="text-on-surface-variant hover:text-surface-tint transition-colors cursor-pointer active:opacity-70" title="Terminal">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+</button>
+<button class="text-on-surface-variant hover:text-surface-tint transition-colors cursor-pointer active:opacity-70" title="Profile">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+<button class="border border-surface-tint bg-surface-tint/10 text-surface-tint px-4 py-1.5 font-label-xs text-label-xs uppercase hover:bg-surface-tint hover:text-surface transition-all shadow-[0_0_10px_rgba(60,220,209,0.1)]" onclick="alert('Error: Requires biometric authentication.');">
+                    ELEVATE_PRIVILEGES
+                </button>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 mt-16 p-6 overflow-y-auto w-full max-w-[1600px] mx-auto">
+<!-- Filter Bar -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 bg-surface/40 p-4 border border-outline-variant/20 backdrop-blur-sm">
+<div class="flex items-center gap-3">
+<span class="font-data-mono text-label-xs text-on-surface-variant uppercase tracking-widest mr-2">Severity Filter:</span>
+<button class="px-3 py-1 border border-error text-error bg-error/10 font-data-mono text-data-mono hover:bg-error/20 transition-colors flex items-center gap-2 glow-critical">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span> Critical
+                    </button>
+<button class="px-3 py-1 border border-[#ffd56b] text-[#ffd56b] font-data-mono text-data-mono hover:bg-[#ffd56b]/10 transition-colors flex items-center gap-2">
+                        High
+                    </button>
+<button class="px-3 py-1 border border-outline-variant text-on-surface-variant font-data-mono text-data-mono hover:text-on-surface transition-colors flex items-center gap-2">
+                        Medium
+                    </button>
+<button class="px-3 py-1 border border-outline-variant text-on-surface-variant font-data-mono text-data-mono hover:text-on-surface transition-colors flex items-center gap-2">
+                        Low
+                    </button>
+</div>
+<div class="flex items-center gap-4 text-data-mono font-data-mono text-on-surface-variant text-[11px]">
+<span>Showing: 1-12 of 1,024 Nodes</span>
+<div class="flex items-center gap-1 border border-outline-variant px-2 py-1 cursor-pointer hover:bg-surface-variant/30">
+                        Sort: Risk <span class="material-symbols-outlined text-[14px]">arrow_drop_down</span>
+</div>
+</div>
+</div>
+<!-- Dense Data Table Grid -->
+<div class="w-full border border-outline-variant/30 bg-surface/50 backdrop-blur-md shadow-2xl">
+<!-- Table Header -->
+<div class="grid grid-cols-[60px_160px_1fr_1fr_1.5fr_100px] gap-4 p-3 border-b border-outline-variant/50 bg-surface-variant/40 font-label-xs text-label-xs text-on-surface-variant uppercase tracking-wider sticky top-0 z-10">
+<div class="pl-2">Stat</div>
+<div>Timestamp (UTC)</div>
+<div>Entity ID</div>
+<div>Origin IP</div>
+<div>Attack Vector (MITRE)</div>
+<div class="text-right pr-4">Risk</div>
+</div>
+<!-- Table Body -->
+<div class="flex flex-col font-data-mono text-data-mono tabular-nums divide-y divide-outline-variant/10">
+<!-- Row 1: Critical -->
+<div class="grid grid-cols-[60px_160px_1fr_1fr_1.5fr_100px] gap-4 p-3 items-center hover:bg-surface-variant/30 hover:border-l-2 hover:border-l-error transition-all group border-l-2 border-transparent bg-error/5 cursor-crosshair">
+<div class="pl-2 text-error">
+<span class="material-symbols-outlined" data-weight="fill">warning</span>
+</div>
+<div class="text-on-surface/80">2023-10-27 14:03:22</div>
+<div class="text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">terminal</span> SRV-PRD-09
+                        </div>
+<div class="text-surface-tint">192.168.1.105</div>
+<div>
+<span class="inline-block px-2 py-0.5 bg-surface-container border border-error/50 text-error text-[11px] font-bold mr-2">
+                                [T1003]
+                            </span>
+<span class="text-on-surface">OS Credential Dumping</span>
+</div>
+<div class="text-right pr-4">
+<span class="inline-block px-2 py-1 bg-error text-surface font-bold rounded-sm glow-critical">
+                                98
+                            </span>
+</div>
+</div>
+<!-- Row 2: High -->
+<div class="grid grid-cols-[60px_160px_1fr_1fr_1.5fr_100px] gap-4 p-3 items-center hover:bg-surface-variant/30 hover:border-l-2 hover:border-l-[#ffd56b] transition-all group border-l-2 border-transparent cursor-crosshair">
+<div class="pl-2 text-[#ffd56b]">
+<span class="material-symbols-outlined" data-weight="fill">policy</span>
+</div>
+<div class="text-on-surface/80">2023-10-27 13:45:10</div>
+<div class="text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">dns</span> DB-CLUSTER-A
+                        </div>
+<div class="text-surface-tint">10.0.45.22</div>
+<div>
+<span class="inline-block px-2 py-0.5 bg-surface-container border border-[#ffd56b]/50 text-[#ffd56b] text-[11px] font-bold mr-2">
+                                [T1190]
+                            </span>
+<span class="text-on-surface">Exploit Public-Facing App</span>
+</div>
+<div class="text-right pr-4">
+<span class="inline-block px-2 py-1 bg-[#ffd56b]/20 border border-[#ffd56b] text-[#ffd56b] font-bold rounded-sm glow-amber">
+                                82
+                            </span>
+</div>
+</div>
+<!-- Row 3: Medium -->
+<div class="grid grid-cols-[60px_160px_1fr_1fr_1.5fr_100px] gap-4 p-3 items-center hover:bg-surface-variant/30 hover:border-l-2 hover:border-l-surface-tint transition-all group border-l-2 border-transparent cursor-crosshair">
+<div class="pl-2 text-surface-tint">
+<span class="material-symbols-outlined">radar</span>
+</div>
+<div class="text-on-surface/80">2023-10-27 13:12:05</div>
+<div class="text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">person</span> USR-JSMITH
+                        </div>
+<div class="text-surface-tint">203.0.113.45</div>
+<div>
+<span class="inline-block px-2 py-0.5 bg-surface-container border border-surface-tint/30 text-surface-tint text-[11px] font-bold mr-2">
+                                [T1110]
+                            </span>
+<span class="text-on-surface">Brute Force</span>
+</div>
+<div class="text-right pr-4">
+<span class="inline-block px-2 py-1 text-surface-tint font-bold">
+                                65
+                            </span>
+</div>
+</div>
+<!-- Row 4: Low -->
+<div class="grid grid-cols-[60px_160px_1fr_1fr_1.5fr_100px] gap-4 p-3 items-center hover:bg-surface-variant/30 hover:border-l-2 hover:border-l-outline transition-all group border-l-2 border-transparent cursor-crosshair">
+<div class="pl-2 text-outline">
+<span class="material-symbols-outlined">info</span>
+</div>
+<div class="text-on-surface/80">2023-10-27 12:55:41</div>
+<div class="text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">router</span> EDGE-FW-01
+                        </div>
+<div class="text-surface-tint opacity-70">198.51.100.2</div>
+<div>
+<span class="inline-block px-2 py-0.5 bg-surface-container border border-outline/30 text-outline text-[11px] font-bold mr-2">
+                                [T1046]
+                            </span>
+<span class="text-on-surface/70">Network Service Scanning</span>
+</div>
+<div class="text-right pr-4">
+<span class="inline-block px-2 py-1 text-outline font-bold">
+                                45
+                            </span>
+</div>
+</div>
+<!-- Row 5: Critical (Zebra Stripe dark) -->
+<div class="grid grid-cols-[60px_160px_1fr_1fr_1.5fr_100px] gap-4 p-3 items-center hover:bg-surface-variant/30 hover:border-l-2 hover:border-l-error transition-all group border-l-2 border-transparent bg-surface-container/30 cursor-crosshair">
+<div class="pl-2 text-error">
+<span class="material-symbols-outlined" data-weight="fill">warning</span>
+</div>
+<div class="text-on-surface/80">2023-10-27 12:30:11</div>
+<div class="text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">lan</span> VNET-CORP-INT
+                        </div>
+<div class="text-surface-tint">172.16.0.44</div>
+<div>
+<span class="inline-block px-2 py-0.5 bg-surface-container border border-error/50 text-error text-[11px] font-bold mr-2">
+                                [T1486]
+                            </span>
+<span class="text-on-surface">Data Encrypted for Impact</span>
+</div>
+<div class="text-right pr-4">
+<span class="inline-block px-2 py-1 bg-error/20 border border-error text-error font-bold rounded-sm glow-critical">
+                                92
+                            </span>
+</div>
+</div>
+<!-- Row 6: Medium -->
+<div class="grid grid-cols-[60px_160px_1fr_1fr_1.5fr_100px] gap-4 p-3 items-center hover:bg-surface-variant/30 hover:border-l-2 hover:border-l-surface-tint transition-all group border-l-2 border-transparent cursor-crosshair">
+<div class="pl-2 text-surface-tint">
+<span class="material-symbols-outlined">radar</span>
+</div>
+<div class="text-on-surface/80">2023-10-27 11:15:00</div>
+<div class="text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">person</span> USR-AADMIN
+                        </div>
+<div class="text-surface-tint">45.33.22.11</div>
+<div>
+<span class="inline-block px-2 py-0.5 bg-surface-container border border-surface-tint/30 text-surface-tint text-[11px] font-bold mr-2">
+                                [T1078]
+                            </span>
+<span class="text-on-surface">Valid Accounts</span>
+</div>
+<div class="text-right pr-4">
+<span class="inline-block px-2 py-1 text-surface-tint font-bold glow-cyan bg-surface-tint/10 rounded-sm">
+                                70
+                            </span>
+</div>
+</div>
+</div>
+<!-- Footer Paginator -->
+<div class="p-3 border-t border-outline-variant/30 flex justify-between items-center bg-surface-variant/20">
+<div class="text-data-mono font-data-mono text-on-surface-variant text-[11px]">
+                        Last updated: <span class="text-surface-tint animate-pulse">Live</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-1 border border-outline-variant hover:border-surface-tint text-on-surface-variant hover:text-surface-tint transition-colors">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="p-1 border border-outline-variant hover:border-surface-tint text-on-surface-variant hover:text-surface-tint transition-colors">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SentinelFlow - Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-variant": "#2f3635",
+                      "secondary-container": "#3e4753",
+                      "outline-variant": "#3c4948",
+                      "on-surface": "#dde4e2",
+                      "surface-tint": "#3cdcd1",
+                      "surface": "#0e1514",
+                      "tertiary": "#ffffff",
+                      "on-secondary": "#28313c",
+                      "on-primary-container": "#00716b",
+                      "secondary-fixed": "#dae3f2",
+                      "primary-fixed-dim": "#3cdcd1",
+                      "on-tertiary-container": "#646469",
+                      "primary": "#ffffff",
+                      "inverse-on-surface": "#2b3231",
+                      "inverse-primary": "#006a64",
+                      "tertiary-fixed": "#e3e2e8",
+                      "on-background": "#dde4e2",
+                      "on-primary-fixed-variant": "#00504b",
+                      "on-error": "#690005",
+                      "on-secondary-fixed": "#131c27",
+                      "on-tertiary-fixed-variant": "#46464b",
+                      "primary-container": "#62f9ee",
+                      "surface-container": "#1a2120",
+                      "background": "#0e1514",
+                      "inverse-surface": "#dde4e2",
+                      "on-error-container": "#ffdad6",
+                      "primary-fixed": "#62f9ee",
+                      "tertiary-container": "#e3e2e8",
+                      "surface-bright": "#333b3a",
+                      "surface-container-high": "#242b2a",
+                      "on-primary": "#003734",
+                      "error": "#ffb4ab",
+                      "on-secondary-container": "#adb6c4",
+                      "surface-dim": "#0e1514",
+                      "on-primary-fixed": "#00201e",
+                      "error-container": "#93000a",
+                      "secondary": "#bec7d6",
+                      "on-secondary-fixed-variant": "#3e4753",
+                      "secondary-fixed-dim": "#bec7d6",
+                      "tertiary-fixed-dim": "#c7c6cb",
+                      "surface-container-highest": "#2f3635",
+                      "surface-container-lowest": "#090f0f",
+                      "on-tertiary-fixed": "#1a1b20",
+                      "outline": "#859491",
+                      "on-tertiary": "#2f3035",
+                      "surface-container-low": "#161d1c",
+                      "on-surface-variant": "#bacac7"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "container-max": "1440px",
+                      "margin": "24px",
+                      "unit": "4px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "data-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "label-xs": [
+                              "JetBrains Mono"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "data-mono": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-xs": [
+                              "11px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for log streams */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(14, 21, 20, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(60, 220, 209, 0.3);
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(60, 220, 209, 0.6);
+        }
+
+        .glass-panel {
+            background: rgba(31, 40, 51, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .glow-accent {
+            box-shadow: 0 0 15px rgba(60, 220, 209, 0.3);
+        }
+        
+        .log-entry {
+            animation: fadeInTop 0.3s ease-out forwards;
+        }
+        
+        @keyframes fadeInTop {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-normal {
+            animation: pulseCyan 2s infinite;
+        }
+        
+        @keyframes pulseCyan {
+            0% { box-shadow: 0 0 0 0 rgba(60, 220, 209, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(60, 220, 209, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(60, 220, 209, 0); }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen overflow-hidden selection:bg-surface-tint selection:text-surface">
+<!-- Background Shader -->
+<div class="fixed inset-0 z-0">
+<div class="absolute inset-0 bg-background/80"></div>
+</div>
+<!-- SideNavBar -->
+<nav class="bg-surface/80 backdrop-blur-xl h-screen w-64 fixed left-0 top-0 border-r border-outline-variant/20 shadow-[0_0_15px_rgba(60,220,209,0.1)] flex flex-col z-50">
+<div class="p-6 border-b border-outline-variant/20">
+<div class="flex items-center gap-4 mb-4">
+<img alt="Operator Session" class="w-10 h-10 rounded-DEFAULT border border-surface-tint/50 object-cover" data-alt="Abstract geometric operator session avatar in dark tactical style with subtle cyan glow accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_0-gYWghfnPywRuPGMgcuHOXJIT2_xacvvAeApWfc-osSkVO1Hlbt0iriEfCuWyV9a6h95CRWN_pRKbOSlvy2tR4pt95PBtRyL9aKzbiiiJKGcVQR92g06_xf-XzesBr8Z7sudBgUXuM5mpMgbWu1gLFLJVVatGKmJRC3z3Xb6jeCHWTRvil36DazmGKfIs6gb9Rtx89hl_dgSqUuAHXV6MsazwCLcRlqmxoyw33R71NApQ_vqP-gWPgViZ9-0HvOpfHzqpm1nVQ"/>
+<div>
+<h1 class="font-data-mono text-headline-md font-bold tracking-tighter text-surface-tint leading-none">SENTINEL_FLOW</h1>
+<p class="font-data-mono text-[10px] text-surface-tint/70 mt-1 uppercase">STATUS: FUSION_ACTIVE</p>
+</div>
+</div>
+<button class="w-full py-2 px-4 border border-surface-tint text-surface-tint font-label-xs text-label-xs uppercase tracking-widest hover:bg-surface-tint hover:text-surface transition-colors duration-200 glow-accent rounded-DEFAULT flex items-center justify-center gap-2" onclick="alert('Deep Scan initiated across all clusters...');">
+<span class="material-symbols-outlined" style="font-size: 16px;">radar</span>
+                INITIATE_SCAN
+            </button>
+</div>
+<div class="flex-1 py-4 overflow-y-auto">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-surface-variant/30 text-surface-tint border-l-2 border-surface-tint transition-all duration-200 ease-in-out active:scale-95" href="/" onclick="">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-data-mono text-data-mono uppercase">Command Center</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface transition-colors hover:bg-surface-variant/50 hover:shadow-[0_0_10px_rgba(60,220,209,0.2)] transition-all duration-200 ease-in-out active:scale-95 border-l-2 border-transparent" href="/triage" onclick="">
+<span class="material-symbols-outlined">security</span>
+<span class="font-data-mono text-data-mono uppercase">Triage Queue</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface transition-colors hover:bg-surface-variant/50 hover:shadow-[0_0_10px_rgba(60,220,209,0.2)] transition-all duration-200 ease-in-out active:scale-95 border-l-2 border-transparent" href="/investigation" onclick="">
+<span class="material-symbols-outlined">biotech</span>
+<span class="font-data-mono text-data-mono uppercase">Investigation</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface transition-colors hover:bg-surface-variant/50 hover:shadow-[0_0_10px_rgba(60,220,209,0.2)] transition-all duration-200 ease-in-out active:scale-95 border-l-2 border-transparent" href="/entity_profile" onclick="">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-data-mono text-data-mono uppercase">Entity Profile</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="p-4 border-t border-outline-variant/20">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant/70 hover:text-surface-tint transition-colors hover:bg-surface-variant/50 border-l-2 border-transparent text-sm" href="#" onclick="alert('This feature is currently locked in the MVP demo.'); return false;">
+<span class="material-symbols-outlined" style="font-size: 18px;">analytics</span>
+<span class="font-data-mono text-[11px] uppercase">System Status</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant/70 hover:text-surface-tint transition-colors hover:bg-surface-variant/50 border-l-2 border-transparent text-sm" href="#" onclick="alert('This feature is currently locked in the MVP demo.'); return false;">
+<span class="material-symbols-outlined" style="font-size: 18px;">settings</span>
+<span class="font-data-mono text-[11px] uppercase">Settings</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- TopAppBar -->
+<header class="bg-surface/60 backdrop-blur-md fixed top-0 right-0 left-64 h-16 border-b border-outline-variant/20 z-40 flex justify-between items-center px-6">
+<div class="flex items-center gap-6">
+<div class="font-data-mono text-headline-md font-black tracking-widest text-surface-tint uppercase text-lg">
+                SENTINEL_FLOW_v2.4
+            </div>
+<nav class="hidden md:flex gap-6">
+<a class="text-surface-tint font-bold border-b border-surface-tint pb-1 font-label-xs text-label-xs uppercase" href="#" onclick="alert('This feature is currently locked in the MVP demo.'); return false;">Models: Fusion</a>
+<a class="text-on-surface-variant font-data-mono hover:text-surface-tint transition-colors pb-1 border-b border-transparent font-label-xs text-label-xs uppercase" href="#" onclick="alert('This feature is currently locked in the MVP demo.'); return false;">IForest</a>
+<a class="text-on-surface-variant font-data-mono hover:text-surface-tint transition-colors pb-1 border-b border-transparent font-label-xs text-label-xs uppercase" href="#" onclick="alert('This feature is currently locked in the MVP demo.'); return false;">Markov</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-3 py-1.5 border border-surface-tint/50 text-surface-tint font-label-xs text-[10px] uppercase tracking-wider hover:bg-surface-tint/10 transition-colors rounded-DEFAULT" onclick="alert('Error: Requires biometric authentication.');">
+                ELEVATE_PRIVILEGES
+            </button>
+<div class="flex items-center gap-2 text-on-surface-variant border-l border-outline-variant/30 pl-4">
+<button class="p-1.5 hover:text-surface-tint hover:bg-surface-variant/20 rounded transition-colors relative">
+<span class="material-symbols-outlined" style="font-size: 20px;">notifications_active</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-1.5 hover:text-surface-tint hover:bg-surface-variant/20 rounded transition-colors">
+<span class="material-symbols-outlined" style="font-size: 20px;">terminal</span>
+</button>
+<button class="p-1.5 hover:text-surface-tint hover:bg-surface-variant/20 rounded transition-colors">
+<span class="material-symbols-outlined" style="font-size: 20px;">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 mt-16 p-gutter h-[calc(100vh-64px)] grid grid-cols-12 gap-unit relative z-10">
+<!-- Centerpiece: Global Map -->
+<div class="col-span-8 glass-panel rounded-lg relative overflow-hidden flex flex-col">
+<div class="h-10 border-b border-white/10 flex items-center justify-between px-4 bg-surface-tint/5">
+<div class="flex items-center gap-2 text-surface-tint">
+<span class="material-symbols-outlined" style="font-size: 16px;">public</span>
+<span class="font-data-mono text-label-xs uppercase tracking-widest">Global Overview</span>
+</div>
+<div class="flex gap-4 font-data-mono text-[10px] uppercase">
+<div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-surface-tint pulse-normal"></span> Normal</div>
+<div class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-error"></span> Anomaly</div>
+</div>
+</div>
+<div class="flex-1 relative bg-surface-container-lowest/50" data-alt="Dark tactical world map visualization with glowing data nodes, hex grid overlays, and stark military-style geographic outlines in a deep slate and cyan palette." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD1gWRegAshNOzfSFg_EOnsQkw6ss5N-a5qb44M2Lxy6AWl888t8koEfI1JwDAz7uRUzpxuEhEFz3_yEbGBpz6z95nPdWj0tSudAXVCOWuZQvFdEBSsuHNnaKMip1vHYG-OYatpyYcZK6jFx-VI-SH2iULSLKySdOyN2sl5l4gBI1BwL1E0n8adbFD3IcCr-OzIHww_10WWV6k1GfTJckXuT3MyiS9DoJMSot86ZDx1WF5C_dXl9_ceRf1Py3mFT3Jq6oTKhCTezfM')">
+<!-- Overlay Data -->
+<div class="absolute top-4 left-4 flex gap-4">
+<div class="bg-surface/80 border border-outline-variant/50 p-2 rounded">
+<div class="font-data-mono text-[9px] text-on-surface-variant uppercase mb-1">Live Events/Sec</div>
+<div class="font-headline-md text-surface-tint text-xl font-bold">1,450</div>
+</div>
+<div class="bg-surface/80 border border-outline-variant/50 p-2 rounded">
+<div class="font-data-mono text-[9px] text-on-surface-variant uppercase mb-1">Ingestion Delay</div>
+<div class="font-headline-md text-surface-tint text-xl font-bold">12ms</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Panel: Live Feed (4 cols) & Left Panel Logic merged into fluid layout -->
+<div class="col-span-4 flex flex-col gap-unit h-full">
+<!-- KPIs Panel -->
+<div class="glass-panel rounded-lg p-4 flex-none border-t-2 border-t-surface-tint">
+<div class="flex items-center gap-2 text-surface-tint mb-4 opacity-80">
+<span class="material-symbols-outlined" style="font-size: 16px;">monitoring</span>
+<span class="font-data-mono text-label-xs uppercase tracking-widest">System KPIs</span>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-end border-b border-white/5 pb-2">
+<div>
+<div class="font-data-mono text-[10px] text-on-surface-variant uppercase">Events Analyzed (24h)</div>
+<div class="font-data-mono text-lg text-surface-tint glow-accent inline-block mt-1" id="events-analyzed">1.2M</div>
+</div>
+<span class="material-symbols-outlined text-surface-tint/50 text-sm">trending_up</span>
+</div>
+<div class="flex justify-between items-end border-b border-white/5 pb-2">
+<div>
+<div class="font-data-mono text-[10px] text-on-surface-variant uppercase">Active Critical Alerts</div>
+<div class="font-data-mono text-lg text-error inline-block mt-1 drop-shadow-[0_0_8px_rgba(255,180,171,0.5)]">14</div>
+</div>
+<span class="material-symbols-outlined text-error/50 text-sm">warning</span>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<div class="font-data-mono text-[10px] text-on-surface-variant uppercase">Concept Drift Global Index</div>
+<div class="font-data-mono text-lg text-secondary-fixed inline-block mt-1">0.04</div>
+</div>
+<span class="material-symbols-outlined text-secondary-fixed/50 text-sm">timeline</span>
+</div>
+</div>
+</div>
+<!-- Live Feed Panel -->
+<div class="glass-panel rounded-lg flex-1 flex flex-col overflow-hidden">
+<div class="h-10 border-b border-white/10 flex items-center justify-between px-4 bg-surface-tint/5 flex-none">
+<div class="flex items-center gap-2 text-surface-tint">
+<span class="material-symbols-outlined" style="font-size: 16px;">list_alt</span>
+<span class="font-data-mono text-label-xs uppercase tracking-widest">Live Event Stream</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-surface-tint animate-pulse"></span>
+</div>
+<div class="flex-1 overflow-y-auto p-2 space-y-1 font-data-mono text-[11px]" id="log-container">
+<!-- Log Entries Generator -->
+<script>
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const container = document.getElementById('log-container');
+                            const types = ['credential_stuffing', 'sql_injection', 'lateral_movement', 'data_exfiltration'];
+                            let counter = 88;
+                            
+                            function createLog() {
+                                const el = document.createElement('div');
+                                const type = types[Math.floor(Math.random() * types.length)];
+                                const risk = Math.floor(Math.random() * 60) + 40;
+                                const isHighRisk = risk > 85;
+                                
+                                el.className = `log-entry p-2 border-l-2 bg-surface/40 hover:bg-surface-variant/30 transition-colors flex flex-col gap-1 ${isHighRisk ? 'border-error text-error/90' : 'border-surface-tint/50 text-on-surface-variant'}`;
+                                
+                                el.innerHTML = `
+                                    <div class="flex justify-between opacity-50 text-[9px]">
+                                        <span>[${new Date().toISOString().split('T')[1].slice(0,-1)}]</span>
+                                        <span>RISK_${risk}</span>
+                                    </div>
+                                    <div class="break-all">
+                                        { "event_id": "evt_${counter++}", "entity_id": "user-${Math.floor(Math.random()*100)}", "risk": ${risk}, "type": "${type}" }
+                                    </div>
+                                `;
+                                
+                                container.prepend(el);
+                                if(container.children.length > 20) {
+                                    container.lastChild.remove();
+                                }
+                            }
+                            
+                            // Init some logs
+                            for(let i=0; i<10; i++) createLog();
+                            
+                            // Simulate stream
+                            setInterval(createLog, 1500);
+                        });
+                    </script>
+</div>
+</div>
+</div>
+</main>
+<script>
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/api/v1/metrics');
+                const data = await response.json();
+                
+                const el1 = document.getElementById('events-analyzed');
+                if (el1) el1.textContent = data.events_analyzed_24h.toLocaleString();
+                
+                const el2 = document.getElementById('active-critical');
+                if (el2) el2.textContent = data.active_critical_alerts;
+                
+                const el3 = document.getElementById('drift-index');
+                if (el3) el3.textContent = data.concept_drift_global_index.toFixed(2);
+                
+                const el4 = document.getElementById('live-events');
+                if (el4) el4.textContent = data.live_events_per_sec.toLocaleString();
+                
+                const el5 = document.getElementById('ingestion-delay');
+                if (el5) el5.textContent = data.ingestion_delay_ms + 'ms';
+                
+                const streamContainer = document.getElementById('event-stream-container');
+                if (streamContainer && data.recent_events) {
+                    streamContainer.innerHTML = '';
+                    data.recent_events.forEach(event => {
+                        const el = document.createElement('div');
+                        el.className = 'font-data-mono text-[10px] bg-surface-container-high p-2 border-l-2 border-surface-tint rounded log-entry mb-2';
+                        const timeStr = event.timestamp.substring(11, 23);
+                        el.innerHTML = `
+                            <div class="flex justify-between text-on-surface-variant mb-1">
+                                <span>[${timeStr}]</span>
+                                <span class="${event.risk > 80 ? 'text-error' : 'text-surface-tint'}">RISK_${event.risk}</span>
+                            </div>
+                            <div class="text-on-surface whitespace-pre-wrap break-all">{ "event_id": "${event.event_id}", "entity_id": "${event.entity_id}", "risk": ${event.risk}, "type": "${event.type}" }</div>
+                        `;
+                        streamContainer.appendChild(el);
+                    });
+                }
+            } catch (e) {
+                console.error('Failed to fetch metrics', e);
+            }
+        }
+        updateDashboard();
+        setInterval(updateDashboard, 2000);
+    </script></body></html>
