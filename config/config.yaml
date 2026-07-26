@@ -1,0 +1,82 @@
+# SentinelFlow Configuration
+# All hyperparameters, thresholds, and paths in one place.
+# No magic numbers in code — everything references this file.
+
+data:
+  n_users: 400
+  n_edge_devices: 150
+  n_service_accounts: 50
+  simulation_days: 45
+  train_days: 30          # days 1-30 for training
+  test_days: 15           # days 31-45 for testing (TEMPORAL split)
+  events_per_entity_per_day: 8  # average
+  random_seed: 42
+
+  # Attack injection rates (fraction of total events)
+  attack_rates:
+    brute_force: 0.003
+    impossible_travel: 0.002
+    credential_stuffing: 0.003
+    lateral_movement: 0.002
+    device_spoofing: 0.001
+    low_and_slow: 0.002
+    insider_drift: 0.002
+
+  # Normal noise parameters
+  normal_auth_failure_rate: 0.02   # 2% of normal events have failed auth
+  normal_secondary_geo_rate: 0.05  # 5% of normal events from secondary geo
+
+rules:
+  brute_force:
+    window_minutes: 10
+    min_failures: 8
+  impossible_travel:
+    max_speed_kmh: 900
+  credential_stuffing:
+    window_minutes: 15
+    min_targets: 15
+    min_failure_rate: 0.70
+  device_spoofing:
+    check_fingerprint: true
+
+features:
+  ewma_alpha: 0.05
+  cold_start_min_events: 20    # weight = min(1.0, n / this)
+  rolling_window_1h: 3600      # seconds
+  rolling_window_24h: 86400    # seconds
+  rolling_window_10min: 600    # seconds
+
+models:
+  tabular:
+    contamination: 0.02
+    iforest_n_estimators: 150
+    iforest_max_features: 0.8
+  sequence:
+    vocab_size: 100            # max unique actions/commands
+    pad_token_id: 0
+  fusion:
+    n_estimators: 300
+    max_depth: 5
+    learning_rate: 0.05
+    eval_metric: "mlogloss"
+
+drift:
+  adwin_delta: 0.001           # tight for sparse anomaly streams
+  ewma_decay: 0.05
+
+explainability:
+  top_k_features: 5
+
+dashboard:
+  replay_speed_days_per_second: 0.2  # 1 day = 5 real seconds
+  risk_thresholds:
+    critical: 90
+    high: 70
+    medium: 50
+    low: 0
+
+paths:
+  access_logs: "data/synthetic_logs/access_logs.csv"
+  hidden_labels: "data/synthetic_logs/hidden_labels.csv"
+  entity_profiles: "data/synthetic_logs/entity_profiles.csv"
+  model_dir: "models/saved/"
