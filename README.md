@@ -25,7 +25,7 @@ streamlit run dashboard/app.py
 ```
 Access Logs → Feature Engine → ┌─ Rule Engine (deterministic)
                                 ├─ IForest + ECOD (tabular)
-                                └─ GRU (sequence/DeepLog)
+                                └─ Markov Chain (sequence/N-Gram)
                                          │
                                     Fusion XGBoost
                                          │
@@ -54,7 +54,7 @@ sentinelflow/
 
 ## Key Features
 
-- **Three parallel detectors**: Rule engine, IForest/ECOD, GRU — each catches different attack families
+- **Three parallel detectors**: Rule engine, IForest/ECOD, Markov Chain — each catches different attack families
 - **7 anomaly types**: Brute force, impossible travel, credential stuffing, lateral movement, device spoofing, low-and-slow exfiltration, insider drift
 - **Cold-start handling**: Cohort-baseline blending (weight = n/20)
 - **Concept drift**: ADWIN from River library

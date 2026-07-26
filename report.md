@@ -1,7 +1,7 @@
 # SentinelFlow - Hackathon Report
 
 ## Executive Summary
-SentinelFlow is a hybrid AI/ML behavioral anomaly detection system designed specifically for SOC analysts. It moves beyond "black-box" alerting by combining deterministic rule engines, statistical anomaly detection (IForest+ECOD), and sequence modeling (GRU) into a powerful XGBoost fusion classifier.
+SentinelFlow is a hybrid AI/ML behavioral anomaly detection system designed specifically for SOC analysts. It moves beyond "black-box" alerting by combining deterministic rule engines, statistical anomaly detection (IForest+ECOD), and sequence modeling (Markov Chain) into a powerful XGBoost fusion classifier.
 
 ## Key Design Decisions & Rubric Alignment
 
